@@ -2,6 +2,9 @@ name: Push to Amazon ECR
 
 on:
   push:
+    paths-ignore:
+      - 'k8s/**'
+      - 'cheat_sheet/**'
     branches:
       - main
 

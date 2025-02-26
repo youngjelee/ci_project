@@ -1,0 +1,20 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ci-project-ingress         # Ingress 리소스의 이름
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internet-facing  # 외부에 노출되는 인터넷 접근 ALB 생성
+    alb.ingress.kubernetes.io/target-type: ip         # 트래픽 전달 대상이 IP 기반임을 명시
+spec:
+  ingressClassName: alb             # ALB(Ingress Controller)를 사용하도록 지정
+  rules:
+  - host: dev-ljy.shop             # 요청을 처리할 도메인 (가비아에서 관리하는 DNS와 연동)
+    http:
+      paths:
+      - path: /*
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: ci-project-service  # Ingress가 트래픽을 전달할 서비스 이름 (위에서 생성한 Service)
+            port:
+              number: 80              # 서비스 포트 (Service 파일의 port와 일치)

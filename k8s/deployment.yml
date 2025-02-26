@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ci-project-deployment         # Deployment 리소스의 이름
+  labels:
+    app: ci-project                   # 이후 Service 등에서 선택자로 사용될 라벨
+spec:
+  replicas: 2                         # 실행할 파드(애플리케이션 인스턴스) 수
+  selector:
+    matchLabels:
+      app: ci-project                 # Deployment가 관리할 파드를 선택하는 기준 라벨
+  template:
+    metadata:
+      labels:
+        app: ci-project               # 생성되는 파드에 부여할 라벨 (selector와 일치해야 함)
+    spec:
+      containers:
+      - name: ci-project-container    # 컨테이너 이름
+        image: 605158037001.dkr.ecr.ap-northeast-2.amazonaws.com/ci_project:latest
+                                        # ECR에 있는 ci_project:latest 이미지 (실제 계정 정보로 변경)
+        ports:
+        - containerPort: 8080           # 애플리케이션이 사용하는 포트 (스프링부트 기본 포트)
+        readinessProbe:                 # 파드가 요청을 받을 준비가 되었는지 확인하는 헬스 체크
+          httpGet:
+            path: /                     # 헬스 체크 URL (스프링부트 actuator 엔드포인트 예시)
+            port: 8080
+          initialDelaySeconds: 10        # 파드 시작 후 헬스 체크 시작 전 대기 시간
+          periodSeconds: 5               # 헬스 체크 주기 (초)
